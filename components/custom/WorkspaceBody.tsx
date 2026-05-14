@@ -13,7 +13,7 @@ const WorkspaceBody = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-4xl font-medium">Workspace</h2>
         <h2 className="text-blue-800 bg-blue-200 p-2 rounded-lg">
-          Remaining Credits: {userDetail?.credits}
+          Remaining Credits: {userDetail?.credits ?? 0}
         </h2>
       </div>
       <Card className="mt-5 flex justify-between items-center p-4 border rounded">
