@@ -18,9 +18,13 @@ function WorkspaceBody() {
   }, []);
 
   const GetGithubUserToken = async () => {
-    const result = await axios.get("/api/github/token");
-    console.log(result.data.token);
-    setToken(result.data.token);
+    try {
+      const result = await axios.get("/api/token");
+      console.log("GitHub Token:", result.data.token);
+      setToken(result.data.token ?? "");
+    } catch (error) {
+      console.error("Failed to fetch GitHub token:", error);
+    }
   };
 
   const onAddRepo = async () => {
