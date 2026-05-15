@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${inter.variable} antialiased`}>
+      <html lang="en" className={`${inter.variable} antialiased`} suppressHydrationWarning>
         <body className="min-h-screen w-full bg-background font-sans">
           <Provider>{children}</Provider>
         </body>

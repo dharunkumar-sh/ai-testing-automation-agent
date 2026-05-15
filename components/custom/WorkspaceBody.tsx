@@ -7,20 +7,24 @@ import { Card, CardContent } from "../ui/card";
 import EmptyWorkspace from "./EmptyWorkspace";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import RepoDialog from "./RepoDialog";
 
 function WorkspaceBody() {
   const { userDetail } = useContext(UserDetailContext);
   const router = useRouter();
-  const [token, setToken] = useState("");
+  const [isGithubConnected, setIsGithubConnected] = useState(false);
 
   useEffect(() => {
-    GetGithubUserToken();
+    checkGithubConnection();
   }, []);
 
-  const GetGithubUserToken = async () => {
-    const result = await axios.get("/api/github/token");
-    console.log(result.data.token);
-    setToken(result.data.token);
+  const checkGithubConnection = async () => {
+    try {
+      const result = await axios.get("/api/token");
+      setIsGithubConnected(result.data.connected ?? false);
+    } catch (error) {
+      console.error("Failed to check GitHub connection:", error);
+    }
   };
 
   const onAddRepo = async () => {
@@ -40,10 +44,12 @@ function WorkspaceBody() {
           <h2 className="text-lg">Connect GitHub & Add Repo</h2>
         </div>
         <div>
-          {!token ? (
+          {!isGithubConnected ? (
             <Button onClick={onAddRepo}>Setup</Button>
           ) : (
-            <Button>+ Add Repo</Button>
+            <RepoDialog
+              setRefreshPage={(refresh: boolean) => console.log(refresh)}
+            />
           )}
         </div>
       </Card>
