@@ -43,9 +43,12 @@ const RepoDialog = ({
   }, []);
 
   const GetRepoList = async () => {
-    const result = await axios.get("/api/github/repos");
-    setRepoList(result.data);
-    console.log(result.data);
+    try {
+      const result = await axios.get("/api/github/repos");
+      setRepoList(result.data);
+    } catch (error) {
+      console.error("Failed to fetch repositories:", error);
+    }
   };
 
   const filteredRepoList = useMemo(() => {
@@ -61,7 +64,7 @@ const RepoDialog = ({
 
     const result = await axios.post("/api/user-repo", {
       repoId: selectedRepo.id,
-      name: selectedRepo.id,
+      name: selectedRepo.name,
       full_name: selectedRepo.full_name,
       private_: selectedRepo.private_,
       html_url: selectedRepo.html_url,
@@ -110,7 +113,11 @@ const RepoDialog = ({
         </div>
         <DialogFooter className="flex gap-5">
           <DialogClose className="cursor-pointer">Cancel</DialogClose>
-          <Button type="submit" disabled={!selectedRepo} onClick={() => SaveRepoToDB()}>
+          <Button
+            type="submit"
+            disabled={!selectedRepo}
+            onClick={() => SaveRepoToDB()}
+          >
             Add
           </Button>
         </DialogFooter>

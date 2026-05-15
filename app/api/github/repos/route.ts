@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
         id: r.id,
         name: r.name,
         full_name: r.full_name,
-        private: r.private,
+        private_: r.private,
         html_url: r.html_url,
         description: r.description,
         updated_at: r.updated_at,
