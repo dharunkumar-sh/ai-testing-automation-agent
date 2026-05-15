@@ -5,9 +5,6 @@ export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("gh_token")?.value;
 
-  if (!token) {
-    return NextResponse.json({ token: null }, { status: 200 });
-  }
-
-  return NextResponse.json({ token });
+  // Return whether the user has a GitHub token, without exposing the token itself
+  return NextResponse.json({ connected: !!token });
 }

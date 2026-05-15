@@ -4,10 +4,12 @@ export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
 
   if (!code) {
+      console.error("Missing authorization code in callback");
     return NextResponse.redirect(
       new URL("/workspace?error=missing_code", req.url),
     );
   }
+  console.log("Exchanging code for token...");
 
   const res = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
@@ -23,13 +25,17 @@ export async function GET(req: NextRequest) {
   });
 
   const data = await res.json();
+    console.log("Token exchange response:", { error: data.error, hasToken: !!data.access_token });
   const token = data.access_token;
 
   if (!token) {
+    console.error("Token exchange failed:", data.error || "Unknown error");
     return NextResponse.redirect(
       new URL("/workspace?error=token_exchange_failed", req.url),
     );
   }
+
+  console.log("Token received successfully");
 
   const response = NextResponse.redirect(new URL("/workspace", req.url));
 
@@ -41,6 +47,8 @@ export async function GET(req: NextRequest) {
     path: "/",
     sameSite: "lax",
   });
+
+  console.log("GitHub token stored in cookie");
 
   return response;
 }
