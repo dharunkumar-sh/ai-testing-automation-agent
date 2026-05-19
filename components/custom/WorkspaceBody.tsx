@@ -5,30 +5,54 @@ import { useContext, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import EmptyWorkspace from "./EmptyWorkspace";
-import { useRouter } from "next/navigation";
 import axios from "axios";
-import RepoDialog from "./RepoDialog";
+import RepoDialog, { Repo } from "./RepoDialog";
+import UserRepoList from "./UserRepoList";
+
+export type UserRepo = {
+  id: number;
+  repoId: number;
+  name: string;
+  fullName: string;
+  private: boolean;
+  html_url: string;
+  description: string;
+  userId: number;
+  owner: string;
+  updatedAt: string;
+  language: string;
+  defaultBranch: string | null;
+};
 
 function WorkspaceBody() {
   const { userDetail } = useContext(UserDetailContext);
-  const router = useRouter();
   const [isGithubConnected, setIsGithubConnected] = useState(false);
+  const [userRepoList, setUserRepoList] = useState<UserRepo[]>([]);
 
   useEffect(() => {
-    checkGithubConnection();
+    userDetail && GetUserAddedRepoList();
+  }, [userDetail]);
+
+  useEffect(() => {
+    GetGithubUserToken();
   }, []);
 
-  const checkGithubConnection = async () => {
-    try {
-      const result = await axios.get("/api/token");
-      setIsGithubConnected(result.data.connected ?? false);
-    } catch (error) {
-      console.error("Failed to check GitHub connection:", error);
+  const GetGithubUserToken = async () => {
+    const result = await axios.get("/api/github/token");
+    const connected = Boolean(result.data.connected);
+    setIsGithubConnected(connected);
+    if (connected && userDetail) {
+      GetUserAddedRepoList();
     }
   };
 
   const onAddRepo = async () => {
-    router.push("/api/github");
+    window.location.href = "/api/github";
+  };
+
+  const GetUserAddedRepoList = async () => {
+    const result = await axios.get("/api/user-repo?userId=" + userDetail?.id);
+    setUserRepoList(result.data);
   };
   return (
     <div>
@@ -47,17 +71,19 @@ function WorkspaceBody() {
           {!isGithubConnected ? (
             <Button onClick={onAddRepo}>Setup</Button>
           ) : (
-            <RepoDialog
-              setRefreshPage={(refresh: boolean) => console.log(refresh)}
-            />
+            <RepoDialog setRefreshPage={() => GetUserAddedRepoList()} />
           )}
         </div>
       </Card>
-      <Card className="mt-10">
-        <CardContent>
-          <EmptyWorkspace />
-        </CardContent>
-      </Card>
+      {userRepoList.length === 0 ? (
+        <Card className="mt-10">
+          <CardContent>
+            <EmptyWorkspace />
+          </CardContent>
+        </Card>
+      ) : (
+        <UserRepoList repoList={userRepoList} />
+      )}
     </div>
   );
 }
