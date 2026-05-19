@@ -15,7 +15,7 @@ import axios from "axios";
 import { Input } from "../ui/input";
 import { UserDetailContext } from "@/context/UserDetailContext";
 
-type Repo = {
+export type Repo = {
   id: number;
   name: string;
   full_name: string;
@@ -38,9 +38,12 @@ const RepoDialog = ({
   const [searchTerm, setSearchTerm] = useState("");
   const { userDetail } = useContext(UserDetailContext);
   const [isOpen, setIsOpen] = useState(false);
+
   useEffect(() => {
-    GetRepoList();
-  }, []);
+    if (isOpen) {
+      GetRepoList();
+    }
+  }, [isOpen]);
 
   const GetRepoList = async () => {
     try {
@@ -48,6 +51,7 @@ const RepoDialog = ({
       setRepoList(result.data);
     } catch (error) {
       console.error("Failed to fetch repositories:", error);
+      setRepoList([]);
     }
   };
 
@@ -69,6 +73,9 @@ const RepoDialog = ({
       private_: selectedRepo.private_,
       html_url: selectedRepo.html_url,
       description: selectedRepo.description,
+      language: selectedRepo.language,
+      default_branch: selectedRepo.default_branch,
+      updated_at: selectedRepo.updated_at,
       userId: userDetail?.id,
       owner: selectedRepo.owner,
     });
@@ -79,7 +86,16 @@ const RepoDialog = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
+          setSearchTerm("");
+          setSelectedRepo(null);
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button>+ Add Repo</Button>
       </DialogTrigger>

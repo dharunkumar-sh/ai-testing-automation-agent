@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
           email: user?.primaryEmailAddress?.emailAddress ?? "",
           name: user?.fullName ?? "New User",
         })
-        .returning();  // Return the created user
+        .returning();
 
       return NextResponse.json({ user: newUser[0] });
     }
@@ -28,6 +28,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ user: userResult[0] });
   } catch (e) {
     console.log("Error Creating User", e);
-    return NextResponse.json({ error: "Failed to create new user" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create new user" },
+      { status: 500 },
+    );
   }
 }

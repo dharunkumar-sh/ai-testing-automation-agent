@@ -52,7 +52,6 @@ export async function GET(req: NextRequest) {
     }
 
     const githubUser = await userCheck.json();
-    console.log(`Fetching repos for GitHub user: ${githubUser.login}`);
 
     // Fetch all repos with pagination
     const allRepos = [];
